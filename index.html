@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sage Care Platform - Identity PoC</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
+        .btn { background-color: #007bff; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1rem; text-decoration: none; display: inline-block; }
+        .btn:hover { background-color: #0056b3; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2 id="title">Sage Care Platform</h2>
+        <p id="message">Loading identity status...</p>
+        
+        <a id="login-btn" class="btn hidden" href="YOUR_COGNITO_DOMAIN/login?client_id=YOUR_CLIENT_ID&response_type=code&scope=email+openid+profile&redirect_uri=YOUR_CALLBACK_URL">
+            Sign In to Care App
+        </a>
+        
+        <button id="logout-btn" class="btn hidden" onclick="logout()">Sign Out</button>
+    </div>
+
+    <script>
+        // CONFIGURATION (Fill these in from AWS)
+        const domain = "YOUR_COGNITO_DOMAIN"; // e.g., sage-poc.auth.us-east-1.amazoncognito.com
+        const clientId = "YOUR_CLIENT_ID";
+        const redirectUri = "https://yourusername.github.io/sage-poc/";
+
+        function checkLogin() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+
+            if (code) {
+                // In a real app, you'd exchange this code for tokens. 
+                // For a PoC, seeing the 'code' in the URL proves the handshake worked!
+                document.getElementById('message').innerText = "Identity Verified! Handshake Successful.";
+                document.getElementById('logout-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('message').innerText = "Please authenticate to access the Caregiver Dashboard.";
+                document.getElementById('login-btn').classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            window.location.href = `https://${domain}/logout?client_id=${clientId}&logout_uri=${redirectUri}`;
+        }
+
+        checkLogin();
+    </script>
+</body>
+</html>
