@@ -3,90 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sage Care Platform - Identity PoC</title>
+    <title>Sage Care Platform</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            /* Branding Update: Added Sage Logo Background */
-            background-color: #f4f7f9;
-            background-image: url('https://cdn.prod.website-files.com/6519dec984290dd6869f19c6/68fa65ee8c56eae2bb670422_logo-mark-rebrand.svg');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 40%; /* Adjust this % to make the logo larger or smaller */
-        }
-        .card { 
-            background: rgba(255, 255, 255, 0.95); /* Semi-transparent white */
-            padding: 3rem; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
-            text-align: center; 
-            max-width: 450px;
-            border: 1px solid #e1e8ed;
-            backdrop-filter: blur(5px); /* Modern frosted-glass effect */
-        }
-        .btn { 
-            background-color: #1a73e8; 
-            color: white; 
-            border: none; 
-            padding: 14px 28px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 1.1rem; 
-            text-decoration: none; 
-            display: inline-block;
-            transition: background 0.3s ease;
-        }
-        .btn:hover { background-color: #1557b0; }
+        body { font-family: sans-serif; background: #f4f7f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; width: 400px; }
+        .btn { background: #1a73e8; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block; cursor: pointer; }
         .hidden { display: none; }
-        h2 { color: #1c1e21; margin-bottom: 0.5rem; }
-        p { color: #606770; margin-bottom: 2rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2 id="title">Sage Care Platform</h2>
-        <p id="message">Loading identity status...</p>
+        <img src="https://cdn.prod.website-files.com/6519dec984290dd6869f19c6/68fa65ee8c56eae2bb670422_logo-mark-rebrand.svg" width="80" alt="Sage Logo">
         
-        <a id="login-btn" class="btn hidden" href="">
-            Sign In to Care App
-        </a>
-        
-        <button id="logout-btn" class="btn hidden" onclick="logout()">Sign Out</button>
+        <div id="guest-ui">
+            <h2>Caregiver Portal</h2>
+            <p>Please sign in to view your resident list.</p>
+            <a id="login-link" class="btn" href="#">Sign In</a>
+        </div>
+
+        <div id="auth-ui" class="hidden">
+            <h2>Daily Resident List</h2>
+            <table>
+                <tr><th>Resident</th><th>Room</th><th>Status</th></tr>
+                <tr><td>Alice M.</td><td>202</td><td>✅ Checked</td></tr>
+                <tr><td>Robert S.</td><td>105</td><td>⚠️ Pending</td></tr>
+            </table>
+            <br>
+            <button class="btn" onclick="logout()" style="background:#666">Sign Out</button>
+        </div>
     </div>
 
     <script>
-        // CONFIGURATION - Update these with your AWS values
-        const domain = "us-east-2vfe396ggz.auth.us-east-2.amazoncognito.com"; 
-        const clientId = "5f0cnjhfsalguvv91krksgtq2rD";
-        const redirectUri = "https://edwardmcdonaldneidenbach.github.io/Sage-Caregiver-App-Prototype/";
+        // FILL THESE IN
+        const DOMAIN = "us-east-2vfe396ggz.auth.us-east-2.amazoncognito.com"; // e.g. us-east-2vfe396ggz.auth.us-east-2.amazoncognito.com
+        const CLIENT_ID = "5f0cnjhfsalguvv91krksgtq2rD";
+        const REDIRECT_URI = "https://edwardmcdonaldneidenbach.github.io/Sage-Caregiver-App-Prototype/";
 
-        // Dynamically build the login URL
-        const loginUrl = `https://${domain}/login?client_id=${clientId}&response_type=code&scope=email+openid+profile&redirect_uri=${encodeURIComponent(redirectUri)}`;
-        document.getElementById('login-btn').href = loginUrl;
+        // 1. Build the Login URL
+        const loginUrl = `https://${DOMAIN}/login?client_id=${CLIENT_ID}&response_type=code&scope=email+openid+profile&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+        document.getElementById('login-link').href = loginUrl;
 
-        function checkLogin() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-
-            if (code) {
-                document.getElementById('message').innerText = "Identity Verified! Handshake Successful.";
-                document.getElementById('logout-btn').classList.remove('hidden');
-            } else {
-                document.getElementById('message').innerText = "Please authenticate to access the Caregiver Dashboard.";
-                document.getElementById('login-btn').classList.remove('hidden');
-            }
+        // 2. Logic to detect if we just came back from Cognito
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('code')) {
+            // We have a code! Show the dashboard
+            document.getElementById('guest-ui').classList.add('hidden');
+            document.getElementById('auth-ui').classList.remove('hidden');
         }
 
         function logout() {
-            window.location.href = `https://${domain}/logout?client_id=${clientId}&logout_uri=${redirectUri}`;
+            window.location.href = `https://${DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${REDIRECT_URI}`;
         }
-
-        checkLogin();
     </script>
 </body>
 </html>
