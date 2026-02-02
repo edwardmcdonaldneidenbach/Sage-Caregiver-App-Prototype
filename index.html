@@ -5,11 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sage Care Platform - Identity PoC</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
-        .btn { background-color: #007bff; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1rem; text-decoration: none; display: inline-block; }
-        .btn:hover { background-color: #0056b3; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            /* Branding Update: Added Sage Logo Background */
+            background-color: #f4f7f9;
+            background-image: url('https://cdn.prod.website-files.com/6519dec984290dd6869f19c6/68fa65ee8c56eae2bb670422_logo-mark-rebrand.svg');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 40%; /* Adjust this % to make the logo larger or smaller */
+        }
+        .card { 
+            background: rgba(255, 255, 255, 0.95); /* Semi-transparent white */
+            padding: 3rem; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+            text-align: center; 
+            max-width: 450px;
+            border: 1px solid #e1e8ed;
+            backdrop-filter: blur(5px); /* Modern frosted-glass effect */
+        }
+        .btn { 
+            background-color: #1a73e8; 
+            color: white; 
+            border: none; 
+            padding: 14px 28px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 1.1rem; 
+            text-decoration: none; 
+            display: inline-block;
+            transition: background 0.3s ease;
+        }
+        .btn:hover { background-color: #1557b0; }
         .hidden { display: none; }
+        h2 { color: #1c1e21; margin-bottom: 0.5rem; }
+        p { color: #606770; margin-bottom: 2rem; }
     </style>
 </head>
 <body>
@@ -17,7 +52,7 @@
         <h2 id="title">Sage Care Platform</h2>
         <p id="message">Loading identity status...</p>
         
-        <a id="login-btn" class="btn hidden" href="YOUR_COGNITO_DOMAIN/login?client_id=YOUR_CLIENT_ID&response_type=code&scope=email+openid+profile&redirect_uri=YOUR_CALLBACK_URL">
+        <a id="login-btn" class="btn hidden" href="">
             Sign In to Care App
         </a>
         
@@ -25,18 +60,20 @@
     </div>
 
     <script>
-        // CONFIGURATION (Fill these in from AWS)
-        const domain = "YOUR_COGNITO_DOMAIN"; // e.g., sage-poc.auth.us-east-1.amazoncognito.com
+        // CONFIGURATION - Update these with your AWS values
+        const domain = "YOUR_COGNITO_DOMAIN"; 
         const clientId = "YOUR_CLIENT_ID";
-        const redirectUri = "https://yourusername.github.io/sage-poc/";
+        const redirectUri = "https://edwardmcdonaldneidenbach.github.io/Sage-Caregiver-App-Prototype/";
+
+        // Dynamically build the login URL
+        const loginUrl = `https://${domain}/login?client_id=${clientId}&response_type=code&scope=email+openid+profile&redirect_uri=${encodeURIComponent(redirectUri)}`;
+        document.getElementById('login-btn').href = loginUrl;
 
         function checkLogin() {
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('code');
 
             if (code) {
-                // In a real app, you'd exchange this code for tokens. 
-                // For a PoC, seeing the 'code' in the URL proves the handshake worked!
                 document.getElementById('message').innerText = "Identity Verified! Handshake Successful.";
                 document.getElementById('logout-btn').classList.remove('hidden');
             } else {
