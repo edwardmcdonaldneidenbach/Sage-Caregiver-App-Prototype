@@ -41,8 +41,14 @@
         const CLIENT_ID = "5f0cnjhfsalguvv91krksgtq2r";
         const REDIRECT_URI = "https://edwardmcdonaldneidenbach.github.io/Sage-Caregiver-App-Prototype/";
 
+        // ADD THIS: This must match the "Provider name" you typed in the AWS SAML settings
+        const idpName = "Sage-Hospital-Client";
+        
         // 1. Build the Login URL
-        const loginUrl = `https://${DOMAIN}/login?client_id=${CLIENT_ID}&response_type=code&scope=email+openid+profile&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+        //const loginUrl = `https://${DOMAIN}/login?client_id=${CLIENT_ID}&response_type=code&scope=email+openid+profile&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+        //document.getElementById('login-link').href = loginUrl;
+
+        const loginUrl = `https://${DOMAIN}/oauth2/authorize?identity_provider=${idpName}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&client_id=${CLIENT_ID}&scope=email+openid+profile`;
         document.getElementById('login-link').href = loginUrl;
 
         // 2. Logic to detect if we just came back from Cognito
